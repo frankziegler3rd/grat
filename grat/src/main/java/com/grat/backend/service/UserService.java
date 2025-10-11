@@ -6,12 +6,24 @@
  * @version 1.0.0
  */
 
+package com.grat.backend.service;
+
+import com.grat.backend.model.User;
+import com.grat.backend.repository.UserRepo;
+import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
+import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.annotation.Id;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class UserService {
 
     private final PasswordEncoder passEncoder;
     private final UserRepo userRepo;
+    private final Map<String, String> sessions = new HashMap<>();
 
     @Autowired
     public UserService(PasswordEncoder passEncoder, UserRepo userRepo) {
@@ -27,12 +39,20 @@ public class UserService {
         return passEncoder.matches(rawPass, user.getHpassword());
     }
 
-    public User registerUser(UUID id, String fname, String lname, String email, String password) {
-        User user = null;
-        if (userRepo.findByEmail(email) == null) {
-            user = new User(id, fname, lname, email, passEncoder.encode(password));
-            userRepo.save(user);
+    public User registerUser(User user) {
+        if (userRepo.findByEmail(user.getEmail()) != null) {
+            return null;
         }
-        return user;
+        user.setId(UUID.randomUUID().toString());
+        user.setHpassword(passEncoder.encode(user.getHpassword()));
+        return userRepo.save(user);
+    }
+
+    public void startSessionForUser(String token, String email) {
+        sessions.put(token, email);
+    }
+
+    public boolean isValidSession(String token) {
+        return sessions.containsKey(token);
     }
 }

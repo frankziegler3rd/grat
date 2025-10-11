@@ -6,44 +6,50 @@
  * @version 1.0.0
  */
 
+package com.grat.backend.model;
+
 import java.util.UUID;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(collection = "users")
 public class User {
     @Id
-    private UUID id;
+    private String id;
 
-    @Field(name = "fname")
-    private String fname;
+    @JsonProperty("fname")
+    private String fName;
 
-    @Field(name = "lname")
-    private String lname;
+    @JsonProperty("lname")
+    private String lName;
 
-    @Field(name = "email")
+    @JsonProperty("email")
     private String email;
 
-    @Field(name = "hpass")
+    @JsonProperty("hpass")
     private String hPass;
 
-    public User(UUID id, String fname, String lname, String email, String hPass) {
+    public User(String id, String fName, String lName, String email, String hPass) {
         this.id = id;
-        this.fname = fname;
-        this.lname = lname;
+        this.fName = fName;
+        this.lName = lName;
         this.email = email;
         this.hPass = hPass;
     }
 
     public String getId() { return id; }
 
-    public void setId(UUID id) { this.id = id; }
+    public void setId(String id) { this.id = id; }
 
-    public String getFname() { return fname; }
+    public String getFName() { return fName; }
 
-    public void setFname(String fname) { this.fname = fname; }
+    public void setFName(String fName) { this.fName = fName; }
 
-    public String getLname() { return Lname; }
+    public String getLName() { return lName; }
 
-    public void setLname(String Lname) { this.Lname = Lname; }
+    public void setLName(String lName) { this.lName = lName; }
 
     public String getEmail() { return email; }
 

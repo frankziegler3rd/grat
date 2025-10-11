@@ -11,6 +11,9 @@ import java.time.LocalTime;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "shifts")
 public class Shift {
@@ -25,7 +28,7 @@ public class Shift {
     private LocalTime clockIn;
 
     @Field(name = "clock_out")
-    private LocalTime clockout;
+    private LocalTime clockOut;
 
     @Field(name = "cash_tips")
     private double cashTips;
@@ -36,7 +39,7 @@ public class Shift {
     @Field(name = "metrics")
     private Map<String, Object> metrics;
 
-    public Shift(UUID id, LocalDate date, LocalTime clockIn, LocalTime clockout, double cashTips, double cardTips, Map<String, Object> metrics) {
+    public Shift(UUID id, LocalDate date, LocalTime clockIn, LocalTime clockOut, double cashTips, double cardTips, Map<String, Object> metrics) {
         this.id = id;
         this.date = date;
         this.clockIn = clockIn;
@@ -64,11 +67,11 @@ public class Shift {
 
     public double getCashTips() { return cashTips; }
 
-    public double setCashTips(double cashTips) { this.cashTips = cashTips; }
+    public void setCashTips(double cashTips) { this.cashTips = cashTips; }
 
     public double getCardTips() { return cardTips; }
 
-    public double setCardTips(double cardTips) { this.cardTips = cardTips; }
+    public void setCardTips(double cardTips) { this.cardTips = cardTips; }
 
     public Map<String, Object> getMetrics() { return metrics; }
 
