@@ -12,15 +12,17 @@ import com.grat.backend.service.UserService;
 import com.grat.backend.model.User;
 import com.grat.backend.model.LoginRequest;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.ResponseEntity;
 import java.util.UUID;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -31,11 +33,12 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest lr) {
-        if (!userService.authenticateUser(lr.getEmail(), lr.getRawPassword())) {
+        User authUser = userService.authenticateUser(lr.getEmail(), lr.getRawPassword());
+        if(authUser == null)
             return ResponseEntity.badRequest().body("Email not found or password incorrect.");
-        }
+        
         String token = UUID.randomUUID().toString();
-        userService.startSessionForUser(token, lr.getEmail());
+        userService.startSessionForUser(token, authUser.getId());
         System.out.println(token);
         return ResponseEntity.ok(Map.of("token", token));
     }
@@ -44,6 +47,15 @@ public class UserController {
     public ResponseEntity<?> register(@RequestBody User user) {
         User regUser = userService.registerUser(user);
         return regUser == null ? ResponseEntity.badRequest().body("Email already registered.") : ResponseEntity.ok("User registered");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("token") String token) {
+        if (userService.getUserIDFromToken(token) != null) {
+            userService.endSessionForUser(token);
+            return ResponseEntity.ok("User logged out");
+        }
+        return ResponseEntity.badRequest().body("No session with this token exists.");
     }
 
     @GetMapping("/ping")

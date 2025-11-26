@@ -6,42 +6,55 @@
  * @version 1.0.0
  */
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+package com.grat.backend.model;
+
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Document(collection = "shifts")
 public class Shift {
 
     @Id
-    private UUID id;
+    private String id;
 
-    @Field(name = "date")
-    private LocalDate date;
+    @JsonProperty("uid")
+    private String uid;
+    
+    @JsonProperty("position")
+    private String position;
 
-    @Field(name = "clock_in")
-    private LocalTime clockIn;
+    @JsonProperty("location")
+    private String location;
 
-    @Field(name = "clock_out")
-    private LocalTime clockOut;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonProperty("clock_in")
+    private LocalDateTime clockIn;
 
-    @Field(name = "cash_tips")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonProperty("clock_out")
+    private LocalDateTime clockOut;
+
+    @JsonProperty("cash_tips")
     private double cashTips;
 
-    @Field(name = "card_tips")
+    @JsonProperty("card_tips")
     private double cardTips;
 
-    @Field(name = "metrics")
+    @JsonProperty("metrics")
     private Map<String, Object> metrics;
 
-    public Shift(UUID id, LocalDate date, LocalTime clockIn, LocalTime clockOut, double cashTips, double cardTips, Map<String, Object> metrics) {
+    public Shift(String id, String uid, String position, String location, LocalDateTime clockIn, LocalDateTime clockOut, double cashTips, double cardTips, Map<String, Object> metrics) {
         this.id = id;
-        this.date = date;
+        this.uid = uid;
+        this.position = position;
+        this.location = location;
         this.clockIn = clockIn;
         this.clockOut = clockOut;
         this.cashTips = cashTips;
@@ -49,21 +62,29 @@ public class Shift {
         this.metrics = metrics;
     }
 
-    public UUID getId() { return id; }
+    public String getId() { return id; }
 
-    public void setId() { this.id = id; }
+    public void setId(UUID id) { this.id = id.toString(); }
 
-    public LocalDate getDate() { return date; }
+    public String getUid() { return uid; }
 
-    public void setDate(LocalDate date) { this.date = date; }
+    public void setUid(String uid) { this.uid = uid; }
 
-    public LocalTime getClockIn() { return clockIn; }
+    public String getPosition() { return position; }
 
-    public void setClockIn(LocalTime clockIn) { this.clockIn = clockIn; }
+    public void setPosition(String position) { this.position = position; }
 
-    public LocalTime getClockOut() { return clockOut; }
+    public String getLocation() { return location; }
 
-    public void setClockOut(LocalTime clockOut) { this.clockOut = clockOut; }
+    public void setLocation(String location) { this.location = location; }
+
+    public LocalDateTime getClockIn() { return clockIn; }
+
+    public void setClockIn(LocalDateTime clockIn) { this.clockIn = clockIn; }
+
+    public LocalDateTime getClockOut() { return clockOut; }
+
+    public void setClockOut(LocalDateTime clockOut) { this.clockOut = clockOut; }
 
     public double getCashTips() { return cashTips; }
 

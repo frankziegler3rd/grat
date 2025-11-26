@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(collection = "users")
 public class User {
+    
     @Id
     private String id;
 

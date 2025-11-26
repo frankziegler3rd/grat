@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.HashMap;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.data.annotation.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
@@ -31,12 +30,12 @@ public class UserService {
         this.userRepo = userRepo;
     }
 
-    public boolean authenticateUser(String email, String rawPass) {
+    public User authenticateUser(String email, String rawPass) {
         User user = userRepo.findByEmail(email);
         if (user == null) {
-            return false;
+            return null;
         }
-        return passEncoder.matches(rawPass, user.getHpassword());
+        return passEncoder.matches(rawPass, user.getHpassword()) ? user : null;
     }
 
     public User registerUser(User user) {
@@ -48,11 +47,19 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public void startSessionForUser(String token, String email) {
-        sessions.put(token, email);
+    public void startSessionForUser(String token, String uid) {
+        sessions.put(token, uid);
     }
 
-    public boolean isValidSession(String token) {
+    public String getUserIDFromToken(String token) {
+        return sessions.get(token);
+    }
+
+    public boolean checkIfValidSession(String token) {
         return sessions.containsKey(token);
+    }
+
+    public void endSessionForUser(String token) {
+        sessions.remove(token);
     }
 }
