@@ -17,6 +17,7 @@ export default function RootLayout() {
             <Stack options={{ headerShown: false }}>
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(settings)" options={{ headerShown: false }} />
                 <Stack.Screen
                     name="new_shift"
                     options={{
@@ -26,7 +27,7 @@ export default function RootLayout() {
                     }}
                 />
                 <Stack.Screen
-                    name="shift_modal"
+                    name="modify_shift"
                     options={{
                         presentation: "modal",
                         headerShown: false,

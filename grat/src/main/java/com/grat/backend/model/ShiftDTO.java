@@ -12,21 +12,11 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-@Document(collection = "shifts")
-public class Shift {
+public class ShiftDTO {
 
-    @Id
-    private String id;
-
-    @JsonProperty("uid")
-    private String uid;
-    
     @JsonProperty("position")
     private String position;
 
@@ -50,11 +40,7 @@ public class Shift {
     @JsonProperty("metrics")
     private Map<String, Object> metrics;
 
-    public Shift() {}
-
-    public Shift(String id, String uid, String position, String location, LocalDateTime clockIn, LocalDateTime clockOut, double cashTips, double cardTips, Map<String, Object> metrics) {
-        this.id = id;
-        this.uid = uid;
+    public ShiftDTO(String position, String location, LocalDateTime clockIn, LocalDateTime clockOut, double cashTips, double cardTips, Map<String, Object> metrics) {
         this.position = position;
         this.location = location;
         this.clockIn = clockIn;
@@ -63,14 +49,6 @@ public class Shift {
         this.cardTips = cardTips;
         this.metrics = metrics;
     }
-
-    public String getId() { return id; }
-
-    public void setId(UUID id) { this.id = id.toString(); }
-
-    public String getUid() { return uid; }
-
-    public void setUid(String uid) { this.uid = uid; }
 
     public String getPosition() { return position; }
 

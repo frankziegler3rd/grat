@@ -15,22 +15,36 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { baseURL } from "../constants/api.ts";
 
-export default function NewShift() {
+export default function ModifyShift() {
     
     const theme = useTheme();
-    const { date } = useLocalSearchParams();
     const router = useRouter();
-    const shiftDate = date ? createLocalDate(date as string) : new Date();
-    const [position, setPosition] = useState("");
-    const [wlocation, setWLocation] = useState("");
-    const [clockIn, setClockIn] = useState(shiftDate);
-    const [clockOut, setClockOut] = useState(shiftDate);
-    const [cardTips, setCardTips] = useState("");
-    const [cashTips, setCashTips] = useState("");
+
+    const { shift } = useLocalSearchParams();
+    
+    const shiftParsed = shift ? JSON.parse(shift) : null;
+   
+    console.log(shiftParsed);
+
+    const initialMetrics = shiftParsed?.metrics
+      ? Object.entries(shiftParsed.metrics).map(([name, value]) => ({ 
+          name, 
+          value: String(value) 
+        }))
+      : [];
+    const [position, setPosition] = useState(shiftParsed.position);
+    const [wlocation, setWLocation] = useState(shiftParsed.location);
+    const [clockIn, setClockIn] = useState(parseLocalDate(shiftParsed.clock_in));
+    const [clockOut, setClockOut] = useState(parseLocalDate(shiftParsed.clock_out));
+    const [cardTips, setCardTips] = useState(shiftParsed.card_tips.toString());
+    const [cashTips, setCashTips] = useState(shiftParsed.cash_tips.toString());
     const [showMetricForm, setShowMetricForm] = useState(false);
-    const [metrics, setMetrics] = useState<{ name: string, value: string }[]>([]);
+    const [metrics, setMetrics] = useState<{ name: string, value: string }[]>(initialMetrics);
     const [newMetricName, setNewMetricName] = useState("");
     const [newMetricValue, setNewMetricValue] = useState("");
+    const [shiftDate, setShiftDate] = useState(
+      shiftParsed ? parseLocalDate(shiftParsed.clock_in) : new Date()
+    );
 
     function createLocalDate(dateString) { 
         const [year, month, day] = dateString.split("-").map(Number); 
@@ -43,6 +57,28 @@ export default function NewShift() {
         return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}`; 
     };
 
+    function parseLocalDate(dateStr: String) {
+        if (!dateStr) return new Date();
+        const [date, time] = dateStr.split('T');
+        const [year, month, day] = date.split('-').map(Number);
+        const [h, m, sDotMs] = time.split(':');
+        const [s, ms] = sDotMs.split('.');
+        return new Date(year, month-1, day, Number(h), Number(m), Number(s), Number(ms) || 0);
+    }
+
+
+    const combineDateAndTime = (datePart: Date, timePart: Date) => {
+        const combined = new Date(datePart);
+        combined.setHours(timePart.getHours());
+        combined.setMinutes(timePart.getMinutes());
+        combined.setSeconds(timePart.getSeconds());
+        combined.setMilliseconds(timePart.getMilliseconds());
+        return combined;
+    };
+
+    const handleDateChange = () => {
+
+    }
 
     const addNewMetric = () => {
         if (!newMetricName) return;
@@ -52,19 +88,20 @@ export default function NewShift() {
         setShowMetricForm(false);
     };
 
-    const submitShift = async () => {
+    const modifyShift = async () => {
         try {
             const token = await AsyncStorage.getItem("token");
-
-            const clockInStr = formatLocalDate(clockIn);
-            const clockOutStr = formatLocalDate(clockOut);
-
+            const clockInCombined = combineDateAndTime(shiftDate, clockIn);
+            const clockOutCombined = combineDateAndTime(shiftDate, clockOut);
+            const clockInStr = formatLocalDate(clockInCombined);
+            const clockOutStr = formatLocalDate(clockOutCombined);
+            console.log(shift.id);
             if (!token) return;
 
-            await axios.post(
-                `${baseURL}/shifts/add`,
+            const response = await axios.post(
+                `${baseURL}/shifts/update/${shiftParsed.id}`,
                 {
-                    position,
+                    position: position,
                     location: wlocation,
                     clock_in: clockInStr,
                     clock_out: clockOutStr,
@@ -72,14 +109,30 @@ export default function NewShift() {
                     cash_tips: parseFloat(cashTips) || 0,
                     metrics: metrics.reduce((acc, m) => ({ ...acc, [m.name]: m.value }), {}),
                 },
-                    { headers: { Authorization: `Bearer ${token}` } }
-            );
-
+                    { headers: { token } 
+            });
+            console.log(response.data);
             router.back();
         } catch (e: any) {
             console.error("Failed to submit shift:", e.response?.data || e.message);
         }
     };
+
+    const deleteShift = async () => {
+        try {
+            const token = await AsyncStorage.getItem("token");
+            console.log("token: ", token)
+            console.log("shiftParsed.id: ", shiftParsed.id);
+            if (!token) return;
+            const response = await axios.delete(`${baseURL}/shifts/delete/${shiftParsed.id}`, {
+                headers: { token }
+            });
+            console.log(response.data);
+            router.back();
+        } catch(error: any) {
+            console.error(error);
+        }
+    }
 
     const styles = StyleSheet.create({
         dateHeader: {
@@ -128,7 +181,7 @@ export default function NewShift() {
                         marginBottom: 2,
                     }}>
                     
-                    New Shift Entry
+                    Modify This Shift
                 </Text>
                 <Text
                     style={{
@@ -137,11 +190,22 @@ export default function NewShift() {
                         color: theme.colors.onSurfaceVariant,
                     }}>
                     
-                    {shiftDate.toDateString()}
                 </Text>
             </View>
             <Card style={styles.card}>
                 <Card.Content>
+                    <View style={styles.clockRow}>
+                        <View style={styles.clockCol}>
+                            <Text style={styles.clockLabel}>Date</Text>
+                            <DateTimePicker
+                                value={shiftDate}
+                                mode="date"
+                                display="default"
+                                onChange={(event, selectedDate) => {
+                                    if (selectedDate) setShiftDate(selectedDate);
+                                }}/>
+                        </View>
+                    </View>
                     <TextInput
                         label="Position"
                         value={position}
@@ -199,7 +263,7 @@ export default function NewShift() {
                         + Add Metric
                     </Button>
 
-                    {showMetricForm && (
+                    { showMetricForm && (
                         <View style={{ marginBottom: 12 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                                 <TextInput
@@ -231,8 +295,7 @@ export default function NewShift() {
                         </View>
                     )}
 
-                        {/* Existing metrics list */}
-                    {metrics.map((metric, index) => (
+                    { metrics.map((metric, index) => (
                         <View
                             key={index}
                             style={{
@@ -274,10 +337,20 @@ export default function NewShift() {
 
                     <Button
                         mode="contained"
-                        onPress={submitShift}
+                        onPress={modifyShift}
                         style={{ marginTop: 16, borderRadius: 8 }}>
                         
-                        Submit Shift
+                        Update Shift
+                    </Button>
+
+                    <Button
+                        mode="outlined"
+                        onPress={deleteShift}
+                        buttonColor="transparent"
+                        textColor={theme.colors.error}
+                        style={{ marginTop: 16, borderRadius: 24 }}>
+                        
+                        Delete Shift
                     </Button>
                 </Card.Content>
             </Card>

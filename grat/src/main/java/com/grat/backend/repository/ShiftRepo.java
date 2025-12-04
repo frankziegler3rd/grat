@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.List;
 import java.time.LocalDateTime;
 
-public interface ShiftRepo extends MongoRepository<Shift, UUID> {
-	List<Shift> findByUid(String uid);
-	List<Shift> findByUidAndClockInBetween(String uid, LocalDateTime clockIn, LocalDateTime clockOut); 
+public interface ShiftRepo extends MongoRepository<Shift, String> {
+    List<Shift> findByUid(String uid);
+    List<Shift> findByUidAndClockInBetween(String uid, LocalDateTime start, LocalDateTime end); 
 }

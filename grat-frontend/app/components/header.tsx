@@ -1,31 +1,39 @@
+
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
-import Svg, { Path } from 'react-native-svg';
-import GratIcon from '../../assets/grat1(2).svg';
+import { IconButton, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import GratIcon from '../../assets/gratHeaderLogo.svg';
+import { useRouter } from 'expo-router';
 
 export default function Header() {
+    
     const theme = useTheme();
+    const router = useRouter();
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.surface }]}>
-            <GratIcon width={60} height={60} />
-        </SafeAreaView>
+        <View style={{ backgroundColor: theme.colors.surface }}>
+            
+            <SafeAreaView edges={['top']} />
+
+            <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+                <GratIcon width={140} height={36} />
+                <IconButton 
+                    icon="cog-outline"
+                    size={28}
+                    iconColor={theme.colors.primary}
+                    onPress={ () => router.push("/(settings)") }/>
+            </View>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    header: {
+        height: 64,
         flexDirection: 'row',
         alignItems: 'center',
-        height: 112,
+        justifyContent: 'space-between',
         paddingHorizontal: 16,
-        justifyContent: 'center',
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
     },
 });

@@ -30,28 +30,22 @@ export default function TabsLayout() {
                     fontSize: 12,
                     fontWeight: '600',
                 },
-            }}
-        >
+            }}>
             <Tabs.Screen
                 name="home"
                 options={{
                     tabBarIcon: ({ color }) => <FontAwesome size={24} name="home" color={color} />
-                }}
-            />
-
+                }}/>
             <Tabs.Screen
                 name="stats"
                 options={{
                     tabBarIcon: ({ color }) => <FontAwesome size={24} name="bar-chart" color={color} />
-                }}
-            />
-
+                }}/>
             <Tabs.Screen
-                name="profile"
+                name="history"
                 options={{
-                    tabBarIcon: ({ color }) => <FontAwesome size={24} name="user-circle" color={color} />
-                }}
-            />
+                    tabBarIcon: ({ color }) => <FontAwesome size={24} name="history" color={color} />
+                }}/>
         </Tabs>
     );
 };
