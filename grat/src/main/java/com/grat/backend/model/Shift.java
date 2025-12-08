@@ -1,0 +1,109 @@
+/**
+ * grat – senior project
+ * shift model
+ * 
+ * @author frank ziegler
+ * @version 1.0.0
+ */
+
+package com.grat.backend.model;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+/**
+ * The actual Shift domain object. Not exposed to client.
+ */
+@Document(collection = "shifts")
+public class Shift {
+
+    @Id
+    private String id;
+
+    @JsonProperty("uid")
+    private String uid;
+    
+    @JsonProperty("position")
+    private String position;
+
+    @JsonProperty("location")
+    private String location;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonProperty("clock_in")
+    private LocalDateTime clockIn;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonProperty("clock_out")
+    private LocalDateTime clockOut;
+
+    @JsonProperty("cash_tips")
+    private double cashTips;
+
+    @JsonProperty("card_tips")
+    private double cardTips;
+
+    @JsonProperty("metrics")
+    private Map<String, Object> metrics;
+
+    public Shift() {}
+
+    public Shift(String id, String uid, String position, String location, LocalDateTime clockIn, LocalDateTime clockOut, double cashTips, double cardTips, Map<String, Object> metrics) {
+        this.id = id;
+        this.uid = uid;
+        this.position = position;
+        this.location = location;
+        this.clockIn = clockIn;
+        this.clockOut = clockOut;
+        this.cashTips = cashTips;
+        this.cardTips = cardTips;
+        this.metrics = metrics;
+    }
+
+    public String getId() { return id; }
+
+    public void setId(UUID id) { this.id = id.toString(); }
+
+    public String getUid() { return uid; }
+
+    public void setUid(String uid) { this.uid = uid; }
+
+    public String getPosition() { return position; }
+
+    public void setPosition(String position) { this.position = position; }
+
+    public String getLocation() { return location; }
+
+    public void setLocation(String location) { this.location = location; }
+
+    public LocalDateTime getClockIn() { return clockIn; }
+
+    public void setClockIn(LocalDateTime clockIn) { this.clockIn = clockIn; }
+
+    public LocalDateTime getClockOut() { return clockOut; }
+
+    public void setClockOut(LocalDateTime clockOut) { this.clockOut = clockOut; }
+
+    public double getCashTips() { return cashTips; }
+
+    public void setCashTips(double cashTips) { this.cashTips = cashTips; }
+
+    public double getCardTips() { return cardTips; }
+
+    public void setCardTips(double cardTips) { this.cardTips = cardTips; }
+
+    public Map<String, Object> getMetrics() { return metrics; }
+
+    public void setMetrics(Map<String, Object> metrics) { this.metrics = metrics; }
+
+    public Object getMetricValueByMetric(String metric) {
+        return metrics.get(metric);
+    }
+}
